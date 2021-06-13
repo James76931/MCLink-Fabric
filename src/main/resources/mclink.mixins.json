@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.dries007.mclink.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "server": [
+    "PlayerManagerMixin",
+    "ServerLoginNetworkHandlerAccessor",
+    "ServerLoginNetworkHandlerSubMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+    "ServerConfigListAccessor"
+  ]
+}
