@@ -1,6 +1,7 @@
 plugins {
     id 'fabric-loom' version '0.8-SNAPSHOT'
     id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
 }
 
 sourceCompatibility = JavaVersion.VERSION_16
@@ -16,9 +17,6 @@ repositories {
     // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html
     // for more information about repositories.
-    maven {
-		url "https://maven.shedaniel.me/"
-	}
 }
 
 dependencies {
@@ -33,8 +31,7 @@ dependencies {
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 
-    implementation files("libs/MCLink-lib-0.3.2.jar")
-    implementation 'com.google.code.gson:gson:2.8.7'
+    shadow files("libs/MCLink-lib-0.3.2.jar")
 }
 
 processResources {
@@ -43,6 +40,19 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadow]
+}
+
+build {
+    dependsOn shadowJar
+}
+
+remapJar {
+    dependsOn shadowJar
+    input.set shadowJar.archiveFile.get()
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -54,13 +64,6 @@ tasks.withType(JavaCompile).configureEach {
 
     // Minecraft 1.17 (21w19a) upwards uses Java 16.
     it.options.release = 16
-}
-
-java {
-    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-    // if it is present.
-    // If you remove this line, sources will not be generated.
-    withSourcesJar()
 }
 
 jar {
@@ -76,9 +79,6 @@ publishing {
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
                 builtBy remapJar
-            }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
             }
         }
     }
