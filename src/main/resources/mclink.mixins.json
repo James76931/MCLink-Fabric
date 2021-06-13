@@ -6,12 +6,10 @@
   "server": [
     "PlayerManagerMixin",
     "ServerLoginNetworkHandlerAccessor",
-    "ServerLoginNetworkHandlerSubMixin"
+    "ServerLoginNetworkHandlerSubMixin",
+    "ServerConfigListAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "ServerConfigListAccessor"
-  ]
+  }
 }
