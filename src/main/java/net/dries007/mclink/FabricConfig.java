@@ -82,10 +82,11 @@ public class FabricConfig extends CommonConfig
 	@Override
 	public @Nullable String reload() throws ConfigException, IOException, APIException
 	{
-		Path configPath = FabricLoader.getInstance().getConfigDir().resolve("mclink").resolve("config.json");
+		Path configFolder = FabricLoader.getInstance().getConfigDir().resolve("mclink");
+		Path configPath = configFolder.resolve("config.json");
 		if (!Files.exists(configPath))
 		{
-			Files.createDirectories(configPath.resolve(".."));
+			Files.createDirectories(configFolder);
 			Files.writeString(configPath, GSON.toJson(new RootConfig()));
 		}
 
