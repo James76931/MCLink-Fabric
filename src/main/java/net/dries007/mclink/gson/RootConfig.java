@@ -1,12 +1,14 @@
 package net.dries007.mclink.gson;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RootConfig implements ConfigObject
 {
 	public GeneralConfig general = new GeneralConfig();
-	public ServicesConfig services = new ServicesConfig();
+	public Map<String, List<String>> services = new HashMap<>();
 
 	public static class GeneralConfig implements ConfigObject
 	{
@@ -52,30 +54,6 @@ public class RootConfig implements ConfigObject
 			}
 
 			throw new IllegalArgumentException(name);
-		}
-	}
-
-	public static class ServicesConfig implements ConfigObject
-	{
-		@SerializedName("GameWisp")
-		public List<String> gamewisp = List.of();
-
-		@SerializedName("Patreon")
-		public List<String> patreon = List.of();
-
-		@SerializedName("Twitch")
-		public List<String> twitch = List.of();
-
-		@Override
-		public List<String> getStringList(String name)
-		{
-			return switch (name.toLowerCase())
-				{
-					case "gamewisp" -> gamewisp;
-					case "patreon" -> patreon;
-					case "twitch" -> twitch;
-					default -> throw new IllegalArgumentException(name);
-				};
 		}
 	}
 }

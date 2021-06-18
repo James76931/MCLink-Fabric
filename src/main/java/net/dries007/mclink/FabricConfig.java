@@ -3,30 +3,23 @@ package net.dries007.mclink;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.IntFunction;
-import javax.sql.CommonDataSource;
 import net.dries007.mclink.api.APIException;
 import net.dries007.mclink.common.CommonConfig;
 import net.dries007.mclink.gson.RootConfig;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.Nullable;
 
 public class FabricConfig extends CommonConfig
 {
+	private static final String COMMENT_PREFIX = "_comment: ";
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
-	private final MinecraftServer server;
 	private RootConfig config;
-
-	public FabricConfig(MinecraftServer server)
-	{
-		this.server = server;
-	}
 
 	@Override
 	protected String getString(String key, String def, String comment)
@@ -47,27 +40,33 @@ public class FabricConfig extends CommonConfig
 	}
 
 	@Override
-	protected void addService(String name, String command)
+	protected void addService(String name, String comment)
 	{
-		// this is a hack
+		config.services.put(name, new ArrayList<>());
+		saveConfig();
 	}
 
 	@Override
 	protected void setServiceComment(String name, String comment)
 	{
-		// json doesnt support comments
+		// hack to get per-service comments
+		List<String> serviceList = config.services.get(name);
+		serviceList.removeIf(s -> s.startsWith(COMMENT_PREFIX));
+		serviceList.add(0, COMMENT_PREFIX + comment);
+		saveConfig();
 	}
 
 	@Override
 	protected void setGlobalCommentServices(String comment)
 	{
-		// json doesnt support comments
+		// this is possible but it'd make the config look even uglier than it already does
 	}
 
 	@Override
 	protected List<String>[] getServiceEntries(String name)
 	{
-		return config.services.getStringList(name).stream()
+		return config.services.get(name).stream()
+			.filter(s -> !s.startsWith(COMMENT_PREFIX))
 			.map(CommonConfig::splitArgumentString)
 			.toArray((IntFunction<List<String>[]>) List[]::new);
 	}
@@ -76,7 +75,26 @@ public class FabricConfig extends CommonConfig
 	protected Set<String> getAllDefinedServices()
 	{
 		// this is an even bigger hack
-		return Set.of("Twitch", "Patreon", "GameWisp");
+		return config.services.keySet();
+	}
+
+	public void saveConfig()
+	{
+		try
+		{
+			Path configFolder = FabricLoader.getInstance().getConfigDir().resolve("mclink");
+			if (Files.exists(configFolder) && !Files.isDirectory(configFolder))
+			{
+				Files.delete(configFolder);
+			}
+			Files.createDirectories(configFolder);
+			Path configPath = configFolder.resolve("config.json");
+			Files.writeString(configPath, GSON.toJson(config == null ? new RootConfig() : config));
+		}
+		catch (IOException ex)
+		{
+			throw new RuntimeException("Failed to save config", ex);
+		}
 	}
 
 	@Override
