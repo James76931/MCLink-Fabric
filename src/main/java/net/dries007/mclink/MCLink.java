@@ -100,7 +100,7 @@ public class MCLink implements DedicatedServerModInitializer
 		try
 		{
 			common.setModVersion("0.3.2");
-			common.setMcVersion("1.17");
+			common.setMcVersion("1.17.1");
 			common.setBranding("Fabric");
 			common.setLogger(new JavaLogger(Logger.getLogger("MCLink")));
 			common.setConfig(new FabricConfig());
