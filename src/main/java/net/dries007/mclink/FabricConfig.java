@@ -1,5 +1,6 @@
 package net.dries007.mclink;
 
+import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
@@ -43,6 +44,7 @@ public class FabricConfig extends CommonConfig
 	protected void addService(String name, String comment)
 	{
 		config.services.put(name, new ArrayList<>());
+		setServiceComment(name, comment);
 		saveConfig();
 	}
 
@@ -66,7 +68,7 @@ public class FabricConfig extends CommonConfig
 	protected List<String>[] getServiceEntries(String name)
 	{
 		return config.services.get(name).stream()
-			.filter(s -> !s.startsWith(COMMENT_PREFIX))
+			.filter(s -> !Strings.isNullOrEmpty(s) && !s.startsWith(COMMENT_PREFIX))
 			.map(CommonConfig::splitArgumentString)
 			.toArray((IntFunction<List<String>[]>) List[]::new);
 	}
