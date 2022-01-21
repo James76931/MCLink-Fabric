@@ -23,6 +23,7 @@ import net.dries007.mclink.mixin.ServerConfigListAccessor;
 import net.fabricmc.api.DedicatedServerModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.MinecraftVersion;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -100,7 +101,7 @@ public class MCLink implements DedicatedServerModInitializer
 		try
 		{
 			common.setModVersion("0.3.2");
-			common.setMcVersion("1.17.1");
+			common.setMcVersion(MinecraftVersion.CURRENT.getName());
 			common.setBranding("Fabric");
 			common.setLogger(new JavaLogger(Logger.getLogger("MCLink")));
 			common.setConfig(new FabricConfig());
@@ -125,7 +126,7 @@ public class MCLink implements DedicatedServerModInitializer
 		GameProfile profile = new GameProfile(uuid, name);
 		boolean op = ((ServerConfigListAccessor) server.getPlayerManager().getOpList()).callContains(profile);
 		boolean wl = ((ServerConfigListAccessor) server.getPlayerManager().getWhitelist()).callContains(profile);
-		System.out.println("user: " + name + " opped? " + op + " whitelist? " + wl);
+		// System.out.println("user: " + name + " opped? " + op + " whitelist? " + wl);
 
 		common.checkAuthStatusAsync(new Player(null, name, uuid), op, wl, r -> executor.schedule(r, 0, TimeUnit.MILLISECONDS));
 	}
