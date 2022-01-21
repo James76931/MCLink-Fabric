@@ -23,6 +23,13 @@ public class FabricConfig extends CommonConfig
 	private RootConfig config;
 
 	@Override
+	public boolean setClosed(boolean closed) {
+		config.general.closed = closed;
+		saveConfig();
+		return super.setClosed(closed);
+	}
+
+	@Override
 	protected String getString(String key, String def, String comment)
 	{
 		return config.general.getString(key, def);
